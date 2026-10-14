@@ -1,7 +1,6 @@
 classdef DataAcquisitionModel < handle
-    % DataAcquisitionModel coordinates acquisition and stores the last data.
-    % The source is injected, so the model can use mock or real hardware.
-    % The source must implement read() and return finite numeric samples.
+    % Coordinates acquisition and stores the latest sample vector.
+    % Source is injected; it must be an object implementing read().
 
     properties (SetAccess = private)
         lastData = []
@@ -14,17 +13,21 @@ classdef DataAcquisitionModel < handle
 
     methods
         function obj = DataAcquisitionModel(source)
-            if nargin ~= 1 || ~ismethod(source, 'read')
+            if nargin ~= 1 || ~isobject(source) || ...
+                    ~isscalar(source) || ~ismethod(source, 'read')
                 error('DataAcquisitionModel:InvalidSource', ...
-                    'source 必须提供 read() 方法。');
+                    'source 必须是实现 read() 的标量对象。');
             end
             obj.source = source;
         end
 
         function values = acquire(obj)
             values = obj.source.read();
-            validateattributes(values, {'numeric'}, ...
-                {'real', 'finite', 'vector'});
+            if ~(isnumeric(values) && isreal(values) && ...
+                    isvector(values) && all(isfinite(values(:))))
+                error('DataAcquisitionModel:InvalidSamples', ...
+                    '数据源必须返回有限实数数值向量。');
+            end
             values = double(values(:).');
             obj.lastData = values;
             obj.acquisitionCount = obj.acquisitionCount + 1;
