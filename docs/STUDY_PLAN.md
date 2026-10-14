@@ -32,7 +32,7 @@ flowchart LR
 任务：
 - 阅读 [CH00205 对比实验](../CH002/CH00205/README.md)。
 - 分别运行 `ValueCounter` 与 `HandleCounter`。
-- 执行 `b = a` 后修改 `b)，观察 `a) 的状态。
+- 执行 `b = a` 后修改 `b`，观察 `a` 的状态。
 - 说明共享状态可能造成的副作用。
 
 验收：运行 `compareValueAndHandle` 并解释输出。
