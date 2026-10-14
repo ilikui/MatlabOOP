@@ -30,7 +30,7 @@ classdef DataAcquisitionModelTest < matlab.unittest.TestCase
 
         function mockRejectsInvalidSamples(testCase)
             testCase.verifyError(@() MockDataAcquisition([1 NaN]), ...
-                'MATLAB:expectedFinite');
+                'MockDataAcquisition:InvalidSamples');
         end
     end
 end
