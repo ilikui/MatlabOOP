@@ -39,16 +39,15 @@ flowchart TD
 
 ## 仓库结构
 
-现有示例主要位于 `CH002`，可按章节逐步补充说明与练习。
-
-| 路径 | 建议学习任务 |
+| 路径 | 学习任务 |
 | --- | --- |
-| `CH002/CH00201` | 从最小的 `Point2D` 类理解类定义、属性与对象实例 |
-| `CH002/CH00202` | 扩展二维点对象的状态和行为，练习方法设计 |
-| `CH002/CH00203` | 阅读 `A.m`、`DataAcqusitionHardware.m` 等类，观察常量属性、句柄类和硬件抽象 |
-| `CH002/CH00203`、`CH002/CH00204` | 对比 `Viewer` 类，分析界面对象与数据/设备对象的职责边界 |
+| [CH002/CH00201](CH002/CH00201/README.md) | Point2D 入门：类定义、属性、构造函数和句柄语义 |
+| [CH002/CH00202](CH002/CH00202/README.md) | Point2D 封装：输入校验、边界条件和单元测试 |
+| `CH002/CH00203` | 常量属性、句柄对象、Viewer 与数据采集类 |
+| `CH002/CH00204` | Dependent 属性与 GUI 组件封装 |
+| [完整学习计划](docs/STUDY_PLAN.md) | 7 阶段学习任务、验收标准与复盘模板 |
 
-> 文件夹与示例名称以仓库当前内容为准。后续新增章节建议沿用 `CH章节/CH小节` 的组织方式，并为每个小节配套 README、示例和练习。
+**注意：** 不同章节可能存在同名的 `Point2D` 类。学习某一节时，请只将对应章节加入 MATLAB path，避免 MATLAB 调用到其他章节的同名类。
 
 ## 核心知识清单
 
@@ -87,7 +86,7 @@ flowchart TD
 | 适用场景 | 几何数据、配置快照、不可变数据模型 | GUI、设备会话、共享缓存、状态管理对象 |
 | 设计注意 | 避免无意复制大型数据 | 明确共享状态、资源释放和对象生命周期 |
 
-练习：分别创建值类和句柄类，执行 `b = a` 后修改 `b)，观察 `a) 的变化，并解释原因。
+练习：分别创建值类和句柄类，执行 `b = a` 后修改 `b`，观察 `a` 的变化，并解释原因。
 
 ### 5. 继承、组合与多态
 
@@ -169,33 +168,6 @@ flowchart TD
 7. **示例可重复运行**：示例应说明前置条件、运行方式和预期结果。
 8. **标注版本差异**：属性验证、GUI API 等特性应注明最低 MATLAB 版本或替代方案。
 
-建议的类文件结构：
-
-```matlab
-classdef Point2D
-    properties
-        X (1,1) double = 0
-        Y (1,1) double = 0
-    end
-
-    methods
-        function obj = Point2D(x, y)
-            if nargin > 0
-                obj.X = x;
-                obj.Y = y;
-            end
-        end
-
-        function d = distanceTo(obj, other)
-            validateattributes(other, {'Point2D'}, {'scalar'});
-            d = hypot(obj.X - other.X, obj.Y - other.Y);
-        end
-    end
-end
-```
-
-> 说明：示例使用了较新的属性验证语法；如果目标 MATLAB 版本较旧，应改用构造函数中的 `validateattributes` 等方式进行校验。
-
 ## 测试与调试
 
 建议为每个类建立独立测试文件，使用 MATLAB 的 `matlab.unittest` 框架。
@@ -208,8 +180,6 @@ end
 - 状态语义：值类复制与句柄类共享引用是否符合设计。
 - 依赖隔离：算法能否在没有真实硬件、GUI 或网络连接的情况下测试。
 - 回归测试：修改实现后，既有行为仍然正确。
-
-命令行建议：
 
 ```matlab
 % 在项目根目录下执行
