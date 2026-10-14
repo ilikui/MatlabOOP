@@ -1,11 +1,8 @@
 classdef A
-    % A demonstrates class-level constants.
+    % A demonstrates class-level constants and angle conversion.
     %
-    % R is the conversion factor from degrees to radians:
-    % radians = degrees .* A.R
-    %
-    % Example:
-    %   angleRad = 90 * A.R;
+    % R converts degrees to radians: radians = degrees .* A.R.
+    % Example: angleRad = A.degreesToRadians(90);
 
     properties (Constant)
         R = pi / 180
@@ -13,15 +10,23 @@ classdef A
 
     methods (Static)
         function radians = degreesToRadians(degrees)
-            validateattributes(degrees, {'numeric'}, ...
-                {'real', 'finite'});
+            A.validateAngle(degrees, 'degrees');
             radians = degrees .* A.R;
         end
 
         function degrees = radiansToDegrees(radians)
-            validateattributes(radians, {'numeric'}, ...
-                {'real', 'finite'});
+            A.validateAngle(radians, 'radians');
             degrees = radians ./ A.R;
+        end
+    end
+
+    methods (Static, Access = private)
+        function validateAngle(value, name)
+            if ~(isnumeric(value) && isreal(value) && ...
+                    all(isfinite(value(:))))
+                error('A:InvalidAngle', ...
+                    '%s 必须只包含有限实数。', name);
+            end
         end
     end
 end
