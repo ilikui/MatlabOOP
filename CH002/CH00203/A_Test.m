@@ -16,7 +16,12 @@ classdef A_Test < matlab.unittest.TestCase
 
         function rejectsComplexAngles(testCase)
             testCase.verifyError(@() A.degreesToRadians(1i), ...
-                'MATLAB:expectedReal');
+                'A:InvalidAngle');
+        end
+
+        function rejectsNonfiniteAngles(testCase)
+            testCase.verifyError(@() A.radiansToDegrees(Inf), ...
+                'A:InvalidAngle');
         end
     end
 end
