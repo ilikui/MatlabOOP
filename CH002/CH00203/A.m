@@ -1,4 +1,4 @@
-classdef A
+classdef A < handle
     % A demonstrates class-level constants and angle conversion.
     %
     % R converts degrees to radians: radians = degrees .* A.R.
