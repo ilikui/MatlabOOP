@@ -20,10 +20,11 @@ A.radiansToDegrees(pi)  % 180
 v = Viewer();
 v.setText('Hello MATLAB OOP');
 disp(v.getText());
+disp(isgraphics(v.hFig));  % 句柄可读取，但不可由外部重新赋值
 delete(v);
 ```
 
-`Viewer` 将图形句柄设为私有，通过 `setText/getText` 暴露有限的操作接口，并在删除对象时关闭窗口。该示例使用传统的 `figure/uicontrol` API。
+`hFig` 和 `hEdit` 保留公开读取能力，但通过 `SetAccess = private` 限制外部改写；文本交互使用 `setText/getText`。对象删除时会关闭窗口。该示例使用传统的 `figure/uicontrol` API。
 
 ## 3. 硬件占位类的边界
 
@@ -52,6 +53,6 @@ flowchart LR
 
 ## 练习
 
-1. 为 `Viewer` 增加清空文本的方法，但不要公开控件句柄。
+1. 为 `Viewer` 增加清空文本的方法，但不要公开控件句柄的写权限。
 2. 给常量换算方法添加矩阵输入测试。
 3. 说明为什么硬件缓冲区常量不能替代真实设备读取代码。
