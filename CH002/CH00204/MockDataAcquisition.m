@@ -1,5 +1,5 @@
 classdef MockDataAcquisition < handle
-    % MockDataAcquisition returns predefined numeric samples for demos/tests.
+    % Deterministic sample source for demos and unit tests.
 
     properties (Access = private)
         samples
@@ -11,8 +11,12 @@ classdef MockDataAcquisition < handle
             if nargin < 1
                 samples = [1 2 3];
             end
-            validateattributes(samples, {'numeric'}, ...
-                {'real', 'finite', 'vector', 'nonempty'});
+            if ~(isnumeric(samples) && isreal(samples) && ...
+                    isvector(samples) && ~isempty(samples) && ...
+                    all(isfinite(samples(:))))
+                error('MockDataAcquisition:InvalidSamples', ...
+                    'samples 必须是非空有限实数向量。');
+            end
             obj.samples = double(samples(:).');
         end
 
