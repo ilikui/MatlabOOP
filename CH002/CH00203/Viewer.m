@@ -8,7 +8,7 @@ classdef Viewer < handle
     %   disp(v.getText());
     %   delete(v);
 
-    properties (Access = private)
+    properties (SetAccess = private)
         hFig
         hEdit
     end
