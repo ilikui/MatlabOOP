@@ -11,9 +11,12 @@ classdef Viewer < handle
     %   v.refresh();
     %   delete(v);
 
-    properties (Access = private)
+    properties (SetAccess = private)
         hFig
         hEdit
+    end
+
+    properties (Access = private)
         model
     end
 
