@@ -64,9 +64,9 @@ flowchart LR
 **目标：** 理解界面、业务逻辑和设备访问的职责边界。
 
 任务：
-- 阅读 [CH00203](../CH002/CH00203/README.md) 与 [CH00204](../CH002/CH00204/README.md)。
-- 运行 `demoDecoupledViewer`，观察 Viewer 只负责显示，模型负责采集。
-- 使用模拟硬件验证数据流程，不依赖真实设备。
+- 阅读 [CH00203](../CH002/CH00203/README.md)、[CH00204](../CH002/CH00204/README.md) 与 [CH00206](../CH002/CH00206/README.md)。
+- 运行 `demoDecoupledViewer` 和 `demoSensorPipeline`，观察 Viewer、采集模型、处理器和流水线各自的职责。
+- 使用模拟数据验证采集、统计、时间戳、状态和错误记录，不依赖真实设备。
 
 验收：硬件不可用时，仍可用模拟数据验证主要业务流程。
 
@@ -84,13 +84,13 @@ flowchart LR
 
 ## 阶段七：综合项目
 
-实现一个可测试的传感器数据处理工具：
+实现并扩展一个可测试的传感器数据处理工具（可从 [CH00206 工程流水线](../CH002/CH00206/README.md) 开始）：
 
-- `Sensor`：统一读取接口。
-- `MockSensor`：生成可控的模拟数据。
-- `SensorRecorder`：记录时间戳、数据和状态。
-- `SignalProcessor`：处理数据，不负责 GUI 和硬件访问。
-- `DataViewer`：显示结果，不直接实现算法。
+- `DataAcquisitionModel`：协调采集并保存最近一次有效样本。
+- `MockDataAcquisition`：生成可控的模拟数据。
+- `SensorPipeline`：协调采集与处理，记录运行状态、时间戳和异常。
+- `SensorDataProcessor`：计算统计指标，不负责 GUI 和硬件访问。
+- `Viewer`：显示结果，不直接实现采集算法。
 - `Test*`：覆盖核心逻辑和异常场景。
 
 验收标准：
