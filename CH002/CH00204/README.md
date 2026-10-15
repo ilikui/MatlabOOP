@@ -1,31 +1,33 @@
-# CH00204：Dependent 属性、数据模型与 Viewer 解耦
+# CH00204：数据采集、处理与 Viewer 解耦
 
-本节把旧版 `Viewer` 改造成展示层，并通过构造函数注入 `DataAcquisitionModel`。模型负责调用数据源与保存结果，界面不直接访问硬件。
+本节将采集源、数据模型、纯数据处理和 GUI 展示拆开。Viewer 不负责连接硬件；模型不负责绘图；处理器不依赖 GUI。
 
 ## 分层结构
 
 ```mermaid
 flowchart LR
-    V[Viewer：界面展示] --> M[DataAcquisitionModel：采集协调与状态]
-    M --> S[数据源接口：read]
-    S --> H[真实硬件适配器]
-    S --> T[MockDataAcquisition：模拟数据]
+    S[数据源 read] --> M[DataAcquisitionModel]
+    M --> P[SensorDataProcessor]
+    P --> V[Viewer 展示]
+    S -. 可替换 .-> H[真实硬件适配器]
+    S -. 测试/演示 .-> T[MockDataAcquisition]
 ```
 
-## 快速运行：无 GUI 部分
+## 快速运行：无 GUI
 
 在本目录运行：
 
 ```matlab
-source = MockDataAcquisition([10 20 30]);
+source = MockDataAcquisition([10 20 30 40]);
 model = DataAcquisitionModel(source);
+samples = model.acquire();
 
-model.acquire()
+summary = SensorDataProcessor.summarize(samples)
 model.getLastData()
 model.acquisitionCount
 ```
 
-数据模型本身不依赖 GUI，因此可以在无图形桌面环境中独立测试。
+summary 包含 `count`、`mean`、`min`、`max` 和 `rms`。处理器是纯逻辑代码，可以单独测试，也可以在批处理脚本中复用。
 
 ## 完整 GUI 演示
 
@@ -35,7 +37,9 @@ model.acquisitionCount
 demoDecoupledViewer
 ```
 
-也可以手动执行：
+演示数据流为：模拟源读取 → 模型保存采样 → 处理器计算统计量 → Viewer 显示文本。关闭窗口时会清理 Viewer 对象。
+
+也可以手动运行：
 
 ```matlab
 source = MockDataAcquisition([10 20 30]);
@@ -46,28 +50,32 @@ v.text
 delete(v);
 ```
 
-模拟器只返回预设数据，不代表已经连接真实设备。
+## 自动化测试
 
-## 关键设计
-
-- **依赖注入：** `Viewer(model)` 接收模型，而不是自己创建或控制硬件。
-- **Dependent 属性：** `text` 通过 getter/setter 映射到 GUI 控件。
-- **可替换数据源：** 任何实现 `read()` 并返回有限实数向量的标量对象都可以接入模型。
-- **边界检查：** 模型使用稳定的错误标识检查数据源和采集值。
-- **兼容性：** 保留 `Viewer()` 无参构造方式；没有注入模型时调用 `refresh` 会给出明确错误。
-
-## 运行自动化测试
+在本目录运行：
 
 ```matlab
 results = runtests('DataAcquisitionModelTest.m');
 table(results)
+
+results = runtests('SensorDataProcessorTest.m');
+table(results)
 ```
 
-这些测试只覆盖模型和模拟数据源，不创建 GUI，因此适合自动化或无桌面环境。GUI 演示需要手动验证。
+模型测试覆盖正常采集、采集计数、无效数据源，以及数据源返回 NaN、复数和矩阵的错误分支。处理器测试覆盖行/列向量、统计结果和非法输入。
+
+## 关键设计
+
+- **依赖注入：** `Viewer(model)` 接收模型，不自行创建数据源。
+- **单一职责：** `DataAcquisitionModel` 管理采集与状态；`SensorDataProcessor` 负责纯数据计算；`Viewer` 负责显示。
+- **可替换数据源：** 数据源只需实现 `read()`，并返回非空、有限的实数向量。
+- **边界检查：** 数据在模型和处理器边界分别验证，错误标识稳定。
+- **兼容性：** 保留 `Viewer()` 无参构造；没有模型时调用 `refresh()` 会给出明确错误。
+- **硬件边界：** `MockDataAcquisition` 只返回预设数据，不代表已连接真实设备。
 
 ## 练习
 
-1. 写一个从 MAT 文件读取数据的 source 类，接口仍然是 `read()`。
-2. 为数据模型增加时间戳与采集状态。
-3. 让 Viewer 支持格式化显示均值、最小值、最大值。
-4. 为返回空数据或非有限数据的 source 编写测试，确认模型的错误契约。
+1. 编写 MAT 文件数据源，保持 `read()` 接口不变。
+2. 为模型增加采集时间戳和状态字段。
+3. 把均值、最值等扩展为可插拔处理策略。
+4. 在目标 MATLAB 版本中执行测试，并手动检查 GUI 关闭和删除行为。
