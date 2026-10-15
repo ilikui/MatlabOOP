@@ -21,7 +21,7 @@ flowchart TD
 | [CH00201](CH002/CH00201/README.md) | Point2D 入门：构造函数、属性、方法和句柄语义 |
 | [CH00202](CH002/CH00202/README.md) | Point2D 封装：访问控制、输入验证、边界条件与单元测试 |
 | [CH00203](CH002/CH00203/README.md) | 常量属性、静态方法、GUI 句柄与硬件占位类 |
-| [CH00204](CH002/CH00204/README.md) | Dependent 属性、模拟数据源、数据模型与 Viewer 解耦 |
+| [CH00204](CH002/CH00204/README.md) | 数据源、采集模型、纯数据处理、Viewer 解耦与单元测试 |
 | [CH00205](CH002/CH00205/README.md) | 值类与句柄类的赋值语义对比实验 |
 | [分阶段学习计划](docs/STUDY_PLAN.md) | 7 阶段学习任务、验收标准与复盘模板 |
 
